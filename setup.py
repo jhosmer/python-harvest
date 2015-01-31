@@ -11,7 +11,7 @@ def read(fname):
 setup(
     name='python-harvest',
     version=read('VERSION'),
-    description="Harvest api client",
+    description="Harvest API client",
     long_description=read('README'),
     # http://pypi.python.org/pypi?:action=list_classifiers
     classifiers=[
@@ -26,10 +26,10 @@ setup(
         "Topic :: Utilities",
         "License :: OSI Approved :: MIT License",
         ],
-    keywords='harvestapp timetracking api',
-    author='Alex Goretoy',
-    author_email='alex@goretoy.com',
-    url='https://github.com/lionheart/python-harvest',
+    keywords='harvest harvestapp api',
+    author='Jonathan Hosmer',
+    author_email='jon@pythonforios.com',
+    url='https://github.com/jhosmer/python-harvest',
     license='MIT License',
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
     include_package_data=True,
