@@ -1,6 +1,7 @@
-import os, sys
+import os
+import sys
+import time
 import unittest
-from time import time
 
 sys.path.insert(0, sys.path[0]+"/..")
 
@@ -14,37 +15,38 @@ class TestHarvest(unittest.TestCase):
         pass
 
     def test_status_up(self):
-        self.assertEqual("up", harvest.HarvestStatus().get(), "Harvest must be down?")
+        self.assertEqual('none', harvest.status().get('indicator', None), 'System Outage')
 
-    def test_status_not_down(self):
-        self.assertNotEqual("down", harvest.HarvestStatus().get(), "Harvest must be down?")
+    def test_status_down(self):
+        self.assertNotEqual('none', harvest.status().get('indicator', None), 'All Systems Operational')
 
-    def test_get_today(self):
-        today = self.harvest.get_today()
-        self.assertTrue(today.has_key("for_day"))
+    def test_today(self):
+        today = self.harvest.today
+        self.assertTrue(set(['for_day', 'projects', 'day_entries']).issubset(set(today.keys())))
+        self.assertEqual(today.get('for_day', None), time.strftime('%y-%d-%m'))
 
     def test_add(self):
-        today = self.harvest.get_today()
-        start = time()
-        project = "%s"%today['projects'][0]['id']
-        task = "%s"%today['projects'][0]['tasks'][0]['id']
+        today = self.harvest.today
+        start = time.time()
+        project = today.get('projects', [{}])[0].get('id', None)
+        task    = today.get('projects', [{}])[0].get('tasks', [{}])[0].get('id', None)
         self.assertTrue(self.harvest.add({
             "notes": "%s" % start,
             "hours": "1.5",
             "project_id": project,
             "task_id": task
         }))
-        exists = self.harvest.get_today()
+        exists = self.harvest.today
 
         #test that the entry got added
-        self.assertTrue(len(exists['day_entries']) > len(today['day_entries']))
+        self.assertTrue(len(exists.get('day_entries', [])) > len(today.get('day_entries', [])))
 
-        if len(exists['day_entries']) > len(today['day_entries']):
-            for entry in exists['day_entries']:
-                if "%s"%entry['notes'] == "%s"%start:
-                    self.assertEqual("1.5", "%s"%entry['hours'], "Hours are not equal")
-                    self.assertEqual(project, "%s"%entry['project_id'], "Project Id not equal")
-                    self.assertEqual(task, "%s"%entry['task_id'], "Task Id not equal")
+        if len(exists.get('day_entries', [])) > len(today.get('day_entries', [])):
+            for entry in exists.get('day_entries', []):
+                if entry.get('notes', None) == start:
+                    self.assertEqual("1.5", entry.get('hours', None), "Hours are not equal")
+                    self.assertEqual(project, entry.get('project_id', None), "Project Id not equal")
+                    self.assertEqual(task, entry.get('task_id', None), "Task Id not equal")
 
 if __name__ == '__main__':
     unittest.main()
